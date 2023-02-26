@@ -1,8 +1,0 @@
-prefix=/home/sjtu/code/robomaster/AutoAim_ws/install
-
-Name: predictor
-Description: Description of predictor
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

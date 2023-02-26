@@ -1,8 +1,0 @@
-prefix=/home/sjtu/code/robomaster/AutoAim_ws/install
-
-Name: aimer_msgs
-Description: Description of aimer_msgs
-Version: 0.0.0
-Cflags: 
-Libs: -L${prefix}/lib 
-Requires: 

@@ -1,2 +1,0 @@
-aimer_msgs:detector:predictor
--DCATKIN_DEVEL_PREFIX=/home/sjtu/code/robomaster/AutoAim_ws/devel -DCMAKE_INSTALL_PREFIX=/home/sjtu/code/robomaster/AutoAim_ws/install -G Unix Makefiles
