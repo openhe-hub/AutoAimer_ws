@@ -1,0 +1,8 @@
+prefix=/home/sjtu/code/robomaster/AutoAim_ws/install
+
+Name: detector
+Description: Description of detector
+Version: 0.0.0
+Cflags: 
+Libs: -L${prefix}/lib 
+Requires: 
