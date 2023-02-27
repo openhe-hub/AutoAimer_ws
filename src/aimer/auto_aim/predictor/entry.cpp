@@ -1,6 +1,8 @@
 #include <chrono>
 #include <thread>
 
+#include <ros/ros.h>
+
 #include <fmt/color.h>
 #include <fmt/format.h>
 #include <pybind11/numpy.h>
@@ -128,3 +130,13 @@ PYBIND11_EMBEDDED_MODULE(aimer_auto_aim_predictor, m) {
   // namespace py = pybind11;
   m.def("background_predictor_run", aimer::background_predictor_run);
 }
+
+int main(int argc,char **argv){
+  ros::init(argc,argv,"predictor");
+  ros::NodeHandle node;
+  
+  // ros::Publisher publisher=node.advertise
+  ros::spin();
+  return 0;
+}
+

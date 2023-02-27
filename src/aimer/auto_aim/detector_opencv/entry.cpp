@@ -8,6 +8,8 @@
 #undef __ARM_NEON__
 #endif
 
+#include <ros/ros.h>
+
 #include <algorithm>
 #include <chrono>
 #include <iostream>
@@ -24,11 +26,11 @@
 #include "aimer/auto_aim/base/defs.hpp"
 #include "aimer/auto_aim/detector_opencv/TRTModule.hpp"
 #include "aimer/base/armor_defs.hpp"
-#include "common/common.hpp"
+// #include "common/common.hpp"
 #include "core_io/robot.hpp"
 #include "core_io/sensors.hpp"
-// namespace base
-#include "./base/debug/print.hpp"
+
+// #include "./base/debug/print.hpp"
 
 #define DEAD_GRAY_ARMOR 0
 #define LIVED_GRAY_ARMOR 1
@@ -287,4 +289,13 @@ PYBIND11_EMBEDDED_MODULE(aimer_auto_aim_detector, m) {
   namespace py = pybind11;
   m.def("background_detector_run", background_detector_run,
         py::arg("module_path"));
+}
+
+int main(int argc,char **argv){
+  ros::init(argc,argv,"detector");
+  ros::NodeHandle node;
+  
+  // ros::Publisher publisher=node.advertise
+  ros::spin();
+  return 0;
 }
