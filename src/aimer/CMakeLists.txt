@@ -4,6 +4,7 @@ project(aimer)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
+  aimer_msgs
 )
 
 catkin_package()

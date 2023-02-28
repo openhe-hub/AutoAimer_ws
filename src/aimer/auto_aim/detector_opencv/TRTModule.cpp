@@ -80,8 +80,8 @@ SmartModel::SmartModel(const Attributes& a, const std::string& onnx_file) {
     net.forward();
     is_openvino = true;
   } catch (cv::Exception&) {
-    ::base::print(::base::PrintMode::Warning, "auto_aim.detector",
-                  "无 OpenVINO 环境, 仅用 OpenCV 默认方式读取 .onnx. \n");
+    // ::base::print(::base::PrintMode::Warning, "auto_aim.detector",
+                  // "无 OpenVINO 环境, 仅用 OpenCV 默认方式读取 .onnx. \n");
     net.setPreferableBackend(cv::dnn::DNN_BACKEND_DEFAULT);
     net.setPreferableTarget(cv::dnn::DNN_TARGET_CPU);
     is_openvino = false;

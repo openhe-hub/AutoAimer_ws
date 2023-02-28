@@ -12,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   DetectionResult.msg
+  RobotCmd.msg
+  RobotStatus.msg
+  SensorsData.msg
 )
 
 generate_messages(

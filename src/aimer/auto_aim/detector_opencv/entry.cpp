@@ -9,6 +9,7 @@
 #endif
 
 #include <ros/ros.h>
+#include <aimer_msgs/SensorsData.h>
 
 #include <algorithm>
 #include <chrono>
@@ -22,13 +23,13 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "UltraMultiThread/include/umt/umt.hpp"
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/auto_aim/detector_opencv/TRTModule.hpp"
-#include "aimer/base/armor_defs.hpp"
+// #include "UltraMultiThread/include/umt/umt.hpp"
+#include "./base/defs.hpp"
+#include "TRTModule.hpp"
+#include "../../base/armor_defs.hpp"
 // #include "common/common.hpp"
-#include "core_io/robot.hpp"
-#include "core_io/sensors.hpp"
+// #include "core_io/robot.hpp"
+// #include "core_io/sensors.hpp"
 
 // #include "./base/debug/print.hpp"
 
@@ -157,132 +158,136 @@ bool getTargetArmor(aimer::DetectedArmor a,
 
 void detector_run(const std::string& module_path) {
   // 创建相机陀螺仪数据接收者
-  umt::Subscriber<SensorsData> subscriber("sensors_data");
-  // 创建识别结果发布者
-  umt::Publisher<aimer::DetectionResult> publisher("detections");
+  // umt::Subscriber<SensorsData> subscriber("sensors_data");
+  // // 创建识别结果发布者
+  // umt::Publisher<aimer::DetectionResult> publisher("detections");
 
-  auto detection_checkbox =
-      umt::ObjManager<CheckBox>::find_or_create("show detections");
-  umt::Publisher<cv::Mat> detections_client("image-detections");
+  // auto detection_checkbox =
+  //     umt::ObjManager<CheckBox>::find_or_create("show detections");
+  // umt::Publisher<cv::Mat> detections_client("image-detections");
 
-  auto recv_data = umt::ObjManager<RobotStatus>::find_or_create("robot_status");
-  auto mode_lock = umt::ObjManager<RobotStatus>::find_or_create("mode_lock");
-  // 路径加载四点模型
-  SmartModel module(attributes_armor, module_path);
+  // auto recv_data = umt::ObjManager<RobotStatus>::find_or_create("robot_status");
+  // auto mode_lock = umt::ObjManager<RobotStatus>::find_or_create("mode_lock");
+  // // 路径加载四点模型
+  // SmartModel module(attributes_armor, module_path);
 
-  // TODO:加载Yolo网络模型
+  // // TODO:加载Yolo网络模型
 
-  int fps = 0, fps_count = 0;
-  auto t1 = system_clock::now();
+  // int fps = 0, fps_count = 0;
+  // auto t1 = system_clock::now();
 
-  ::base::print(::base::PrintMode::Info, "auto_aim.detector",
-                "即将运行主循环 {}, {}.\n", 2, 123);
-  while (true) {
-    try {
-      if (recv_data->program_mode == ProgramMode::ENERGY_HIT ||
-          recv_data->program_mode == ProgramMode::ENERGY_DISTURB) {
-        mode_lock->program_mode = recv_data->program_mode;
-        std::this_thread::sleep_for(200ms);
-        continue;
-      }
-      // if (mode_lock->program_mode == ProgramMode::ENERGY_HIT ||
-      // mode_lock->program_mode == ProgramMode::ENERGY_DISTURB)
-      //{
-      //     std::this_thread::sleep_for(200ms);
-      //     continue;
-      // }
-      //  接收传感器数据，但是相机处理传输数据的时间无从得知
-      const auto& [image, q_, timestamp] = subscriber.pop();
-      // double imu_timestamp = recv_data->imu_timestam
-      // 放在 pop 之前或者之后考虑一下
-      // 考虑到 sys_fire_time 测量的也是裁判传输过来以后的时间戳，这里也放后面
-      // pop 本身几乎不耗时间
-      // 均设置为捕获触发记时
-      // q转化为四元数
-      Eigen::Quaternionf q(q_[0], q_[1], q_[2], q_[3]);
+  // ::base::print(::base::PrintMode::Info, "auto_aim.detector",
+  //               "即将运行主循环 {}, {}.\n", 2, 123);
+  // while (true) {
+  //   try {
+  //     if (recv_data->program_mode == ProgramMode::ENERGY_HIT ||
+  //         recv_data->program_mode == ProgramMode::ENERGY_DISTURB) {
+  //       mode_lock->program_mode = recv_data->program_mode;
+  //       std::this_thread::sleep_for(200ms);
+  //       continue;
+  //     }
+  //     // if (mode_lock->program_mode == ProgramMode::ENERGY_HIT ||
+  //     // mode_lock->program_mode == ProgramMode::ENERGY_DISTURB)
+  //     //{
+  //     //     std::this_thread::sleep_for(200ms);
+  //     //     continue;
+  //     // }
+  //     //  接收传感器数据，但是相机处理传输数据的时间无从得知
+  //     const auto& [image, q_, timestamp] = subscriber.pop();
+  //     // double imu_timestamp = recv_data->imu_timestam
+  //     // 放在 pop 之前或者之后考虑一下
+  //     // 考虑到 sys_fire_time 测量的也是裁判传输过来以后的时间戳，这里也放后面
+  //     // pop 本身几乎不耗时间
+  //     // 均设置为捕获触发记时
+  //     // q转化为四元数
+  //     Eigen::Quaternionf q(q_[0], q_[1], q_[2], q_[3]);
 
-      cv::Mat im2show;
+  //     cv::Mat im2show;
 
-      // 先将四点预测结果存储在tmp变量中
-      // auto result_tmp = module(image);
-      std::vector<bbox_t> result = module(image);
-      std::vector<aimer::DetectedArmor> armors;
+  //     // 先将四点预测结果存储在tmp变量中
+  //     // auto result_tmp = module(image);
+  //     std::vector<bbox_t> result = module(image);
+  //     std::vector<aimer::DetectedArmor> armors;
 
-      // 进行熄灭装甲板处理
-      static int cnt = -1;
-      static std::vector<bbox_t> last_outputs;
-      static std::vector<aimer::DetectedArmor> last_armors;
-      static std::vector<aimer::DetectedArmor> tmp_armors;
+  //     // 进行熄灭装甲板处理
+  //     static int cnt = -1;
+  //     static std::vector<bbox_t> last_outputs;
+  //     static std::vector<aimer::DetectedArmor> last_armors;
+  //     static std::vector<aimer::DetectedArmor> tmp_armors;
 
-      if (cnt == -1) {
-        last_outputs = result;
-        cnt = 1;
-      }
+  //     if (cnt == -1) {
+  //       last_outputs = result;
+  //       cnt = 1;
+  //     }
 
-      // 存储上一帧的结果
-      last_outputs = result;
-      // 对结果信息提取到装甲板
-      for (const auto& output : result) {
-        //            if (output.tag_id == 2) continue; // 不瞄准工程
-        cv::Point2f pts[4] = {
-            output.pts[0],
-            output.pts[1],
-            output.pts[2],
-            output.pts[3],
-        };
-        aimer::DetectedArmor a_tmp;
-        a_tmp.pts[0] = pts[0];
-        a_tmp.pts[1] = pts[1];
-        a_tmp.pts[2] = pts[2];
-        a_tmp.pts[3] = pts[3];
-        a_tmp.color = output.color_id;
-        a_tmp.number = output.tag_id == 8 ? 6 : output.tag_id;
-        // 归并前哨站和水晶小板
-        a_tmp.conf = output.confidence;
-        a_tmp.conf_class = output.confidence_cls;
-        armors.emplace_back(a_tmp);
-      }
-      // 根据装甲板大小进行sort
-      sort(armors.begin(), armors.end(), cmp_armor_center);
+  //     // 存储上一帧的结果
+  //     last_outputs = result;
+  //     // 对结果信息提取到装甲板
+  //     for (const auto& output : result) {
+  //       //            if (output.tag_id == 2) continue; // 不瞄准工程
+  //       cv::Point2f pts[4] = {
+  //           output.pts[0],
+  //           output.pts[1],
+  //           output.pts[2],
+  //           output.pts[3],
+  //       };
+  //       aimer::DetectedArmor a_tmp;
+  //       a_tmp.pts[0] = pts[0];
+  //       a_tmp.pts[1] = pts[1];
+  //       a_tmp.pts[2] = pts[2];
+  //       a_tmp.pts[3] = pts[3];
+  //       a_tmp.color = output.color_id;
+  //       a_tmp.number = output.tag_id == 8 ? 6 : output.tag_id;
+  //       // 归并前哨站和水晶小板
+  //       a_tmp.conf = output.confidence;
+  //       a_tmp.conf_class = output.confidence_cls;
+  //       armors.emplace_back(a_tmp);
+  //     }
+  //     // 根据装甲板大小进行sort
+  //     sort(armors.begin(), armors.end(), cmp_armor_center);
 
-      // TODO: 从多个装甲板中选取目标
+  //     // TODO: 从多个装甲板中选取目标
 
-      // 存储上一次识别的装甲板结果
-      last_armors = armors;
+  //     // 存储上一次识别的装甲板结果
+  //     last_armors = armors;
 
-      // 检测结果绘图&显示
-      if (detection_checkbox->checked) {
-        fps_count++;
-        auto t2 = system_clock::now();
-        if (duration_cast<milliseconds>(t2 - t1).count() >= 1000) {
-          fps = fps_count;
-          fps_count = 0;
-          t1 = t2;
-        }
-        // im2show = image.clone();
-        im2show = cv::Mat::zeros(cv::Size(1280, 768), CV_8UC1);
-        draw_boxes(im2show, result);
-        cv::putText(im2show, fmt::format("fps={}", fps), {10, 25},
-                    cv::FONT_HERSHEY_SIMPLEX, 1, {0, 0, 255});
-        detections_client.push(im2show);
-      }
+  //     // 检测结果绘图&显示
+  //     if (detection_checkbox->checked) {
+  //       fps_count++;
+  //       auto t2 = system_clock::now();
+  //       if (duration_cast<milliseconds>(t2 - t1).count() >= 1000) {
+  //         fps = fps_count;
+  //         fps_count = 0;
+  //         t1 = t2;
+  //       }
+  //       // im2show = image.clone();
+  //       im2show = cv::Mat::zeros(cv::Size(1280, 768), CV_8UC1);
+  //       draw_boxes(im2show, result);
+  //       cv::putText(im2show, fmt::format("fps={}", fps), {10, 25},
+  //                   cv::FONT_HERSHEY_SIMPLEX, 1, {0, 0, 255});
+  //       detections_client.push(im2show);
+  //     }
 
-      // 将检测结果放入FIFO
-      publisher.push({image, q, timestamp, armors});
+  //     // 将检测结果放入FIFO
+  //     publisher.push({image, q, timestamp, armors});
 
-    } catch (umt::MessageError& e) {
-      fmt::print(fmt::fg(fmt::color::orange), "[WARNING] 'sensors_data' {}\n",
-                 e.what());
-      std::this_thread::sleep_for(500ms);
-    }
-  }
+  //   } catch (umt::MessageError& e) {
+  //     fmt::print(fmt::fg(fmt::color::orange), "[WARNING] 'sensors_data' {}\n",
+  //                e.what());
+  //     std::this_thread::sleep_for(500ms);
+  //   }
+  // }
 }
 
 void background_detector_run(const std::string& module_path) {
-  std::cerr << "=========================background_detector_run==============="
-               "==============="
-            << std::endl;
-  std::thread([=]() { detector_run(module_path); }).detach();
+  // std::cerr << "=========================background_detector_run==============="
+  //              "==============="
+  //           << std::endl;
+  // std::thread([=]() { detector_run(module_path); }).detach();
+}
+
+void sensorSubCallback(const aimer_msgs::SensorsData::ConstPtr &sensorsData){
+
 }
 
 PYBIND11_EMBEDDED_MODULE(aimer_auto_aim_detector, m) {
@@ -294,6 +299,9 @@ PYBIND11_EMBEDDED_MODULE(aimer_auto_aim_detector, m) {
 int main(int argc,char **argv){
   ros::init(argc,argv,"detector");
   ros::NodeHandle node;
+
+  ros::Subscriber sensorSub=node.subscribe<aimer_msgs::SensorsData>("sensors_data",10,sensorSubCallback);
+  ros::Publisher detectionPub=node.advertise<aimer_msgs::DetectionResult>("detection_result",10);
   
   // ros::Publisher publisher=node.advertise
   ros::spin();
