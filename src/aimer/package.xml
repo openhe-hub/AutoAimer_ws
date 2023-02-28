@@ -12,14 +12,21 @@
   <build_depend>roscpp</build_depend>
   <build_depend>std_msgs</build_depend>
   <build_depend>aimer_msgs</build_depend>
+  <build_depend>UltraMultiThread</build_depend>
+  <build_depend>base</build_depend>
 
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>aimer_msgs</build_export_depend>
+  <build_export_depend>UltraMultiThread</build_export_depend>
+  <build_export_depend>base</build_export_depend>
+  
 
   <exec_depend>roscpp</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>aimer_msgs</exec_depend>
+  <exec_depend>UltraMultiThread</exec_depend>
+  <exec_depend>base</exec_depend>
 
   <export>
   </export>

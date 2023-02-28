@@ -1,19 +1,22 @@
 #include "parameter.hpp"
+
 #include <cstddef>
-// #include "./base/debug/print.hpp"
+#include "UltraMultiThread/umt.hpp"
+#include "base/debug/print.hpp"
 
 namespace aimer {
 namespace param {
 
-// namespace base = ::base;
+namespace umt = ::umt;
+namespace base = ::base;
 
 std::shared_ptr<Integer> create_int_obj(const std::string& str) {
   auto res = umt::ObjManager<Integer>::create("AIMER_" + str);
   if (res == nullptr) {
-    // base::print(
-    //     base::PrintMode::Warning, "param",
-    //     "create_int_obj 中参数 \"{}\" 已经被创建, 但你又尝试创建并被拒绝.\n",
-    //     str);
+    base::print(
+        base::PrintMode::Warning, "param",
+        "create_int_obj 中参数 \"{}\" 已经被创建, 但你又尝试创建并被拒绝.\n",
+        str);
   }
   return res;
 }
@@ -21,8 +24,8 @@ std::shared_ptr<Integer> create_int_obj(const std::string& str) {
 std::shared_ptr<Integer> find_int_obj(const std::string& str) {
   auto res = umt::ObjManager<Integer>::find("AIMER_" + str);
   if (res == nullptr) {
-    // base::print(base::PrintMode::Warning, "param",
-    //             "find_int_obj 找不到传入的键 \"{}\", 并将返回 nullptr.\n", str);
+    base::print(base::PrintMode::Warning, "param",
+                "find_int_obj 找不到传入的键 \"{}\", 并将返回 nullptr.\n", str);
   }
   return res;
 }

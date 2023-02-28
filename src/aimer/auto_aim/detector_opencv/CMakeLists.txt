@@ -17,6 +17,7 @@ aux_source_directory(. src)
 
 add_library(${LIB_NAME} OBJECT entry.cpp ${src})
 
+
 add_executable(detector_opencv ${src})
 
 target_link_libraries(${LIB_NAME} ${OpenCV_LIBS} pthread)

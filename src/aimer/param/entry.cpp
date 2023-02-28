@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "UltraMultiThread/include/umt/umt.hpp"
-#include "aimer/param/parameter.hpp"
+#include "UltraMultiThread/umt.hpp"
+#include "parameter.hpp"
 
 namespace aimer {
 void background_parameter_run() {

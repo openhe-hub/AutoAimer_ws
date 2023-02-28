@@ -10,17 +10,17 @@
 #include <fmt/format.h>
 #include <pybind11/numpy.h>
 
-// #include "UltraMultiThread/include/umt/ObjManager.hpp"
-// #include "UltraMultiThread/include/umt/umt.hpp"
+#include "UltraMultiThread/ObjManager.hpp"
+#include "UltraMultiThread/umt.hpp"
 #include "aimer/auto_aim/base/defs.hpp"
-// #include "enemy_predictor/enemy_predictor.hpp"
+#include "enemy_predictor/enemy_predictor.hpp"
 #include "aimer/base/armor_defs.hpp"
 #include "common/common.hpp"
 // #include "core_io/robot.hpp"
 
 namespace aimer {
 
-// namespace umt = ::umt;
+namespace umt = ::umt;
 using namespace std::chrono_literals;  // like 200ms
 
 void detectionResultCallback(
