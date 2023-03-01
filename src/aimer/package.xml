@@ -14,12 +14,20 @@
   <build_depend>aimer_msgs</build_depend>
   <build_depend>UltraMultiThread</build_depend>
   <build_depend>base</build_depend>
+  <build_depend>cv_bridge</build_depend>
+  <build_depend>eigen_conversions</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
 
   <build_export_depend>roscpp</build_export_depend>
   <build_export_depend>std_msgs</build_export_depend>
   <build_export_depend>aimer_msgs</build_export_depend>
   <build_export_depend>UltraMultiThread</build_export_depend>
   <build_export_depend>base</build_export_depend>
+  <build_export_depend>cv_bridge</build_export_depend>
+  <build_export_depend>eigen_conversions</build_export_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
   
 
   <exec_depend>roscpp</exec_depend>
@@ -27,6 +35,10 @@
   <exec_depend>aimer_msgs</exec_depend>
   <exec_depend>UltraMultiThread</exec_depend>
   <exec_depend>base</exec_depend>
+  <exec_depend>cv_bridge</exec_depend>
+  <exec_depend>eigen_conversions</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
 
   <export>
   </export>

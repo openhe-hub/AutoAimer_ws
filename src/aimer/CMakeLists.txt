@@ -3,12 +3,19 @@ project(aimer)
 
 set(CMAKE_CXX_STANDARD 14)
 
+
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   aimer_msgs
   UltraMultiThread
   base
+
+  geometry_msgs
+  sensor_msgs
+
+  cv_bridge           # ros img conversion
+  eigen_conversions   # ros eigen conversion
 )
 
 catkin_package(INCLUDE_DIRS include)
