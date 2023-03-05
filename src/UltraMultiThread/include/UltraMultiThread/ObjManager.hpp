@@ -45,7 +45,7 @@ class ObjManager : public T {
    */
   template <class... Ts>
   static sptr create(const std::string& name, Ts&&... args) {
-    std::unique_lock lock(_mtx);
+    std::unique_lock<std::mutex> lock(_mtx);
     if (_map.find(name) != _map.end())
       return nullptr;
     sptr p_obj =
@@ -61,7 +61,7 @@ class ObjManager : public T {
    * @return 查找到的共享对象，如果该名称下不存在一个共享对象，则返回nullptr
    */
   static sptr find(const std::string& name) {
-    std::unique_lock lock(_mtx);
+    std::unique_lock<std::mutex> lock(_mtx);
     auto iter = _map.find(name);
     if (iter == _map.end())
       return nullptr;
@@ -78,7 +78,7 @@ class ObjManager : public T {
    */
   template <class... Ts>
   static sptr find_or_create(const std::string& name, Ts&&... args) {
-    std::unique_lock lock(_mtx);
+    std::unique_lock<std::mutex> lock(_mtx);
     auto iter = _map.find(name);
     if (iter != _map.end())
       return iter->second.lock();
@@ -90,7 +90,7 @@ class ObjManager : public T {
   }
 
   static std::set<std::string> names() {
-    std::unique_lock lock(_mtx);
+    std::unique_lock<std::mutex> lock(_mtx);
     std::set<std::string> _names;
     for (const auto& [n, w] : _map) {
       _names.emplace(n);
@@ -102,7 +102,7 @@ class ObjManager : public T {
    * @brief 析构函数中，将该对象从map中删除
    */
   ~ObjManager() {
-    std::unique_lock lock(_mtx);
+    std::unique_lock<std::mutex> lock(_mtx);
     _map.erase(_name);
   }
 

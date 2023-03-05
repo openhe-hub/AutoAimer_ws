@@ -102,7 +102,7 @@ class Subscriber {
   /// 拷贝构造函数
   Subscriber(const Subscriber& other)
       : fifo_size(other.fifo_size), fifo(other.fifo), p_msg(other.p_msg) {
-    std::unique_lock subs_lock(p_msg->subs_mtx);
+    std::unique_lock<std::mutex> subs_lock(p_msg->subs_mtx);
     p_msg->subs.emplace_front(this);
   }
 
@@ -112,7 +112,7 @@ class Subscriber {
         fifo(std::move(other.fifo)),
         p_msg(other.p_msg) {
     other.reset();
-    std::unique_lock subs_lock(p_msg->subs_mtx);
+    std::unique_lock<std::mutex> subs_lock(p_msg->subs_mtx);
     p_msg->subs.emplace_front(this);
   }
 
@@ -128,7 +128,7 @@ class Subscriber {
       fifo = std::queue<T>();
     if (!p_msg)
       return;
-    std::unique_lock subs_lock(p_msg->subs_mtx);
+    std::unique_lock<std::mutex> subs_lock(p_msg->subs_mtx);
     p_msg->subs.remove(this);
     p_msg.reset();
   }
@@ -140,7 +140,7 @@ class Subscriber {
   void bind(const std::string& msg_name) {
     reset();
     p_msg = MsgManager::find_or_create(msg_name);
-    std::unique_lock subs_lock(p_msg->subs_mtx);
+    std::unique_lock<std::mutex> subs_lock(p_msg->subs_mtx);
     p_msg->subs.emplace_front(this);
   }
 
@@ -148,7 +148,7 @@ class Subscriber {
    * @brief 清空接收缓冲区
    */
   void clear() {
-    std::unique_lock lock(mtx);
+    std::unique_lock<std::mutex> lock(mtx);
     fifo = std::queue<T>();
   }
 
@@ -172,7 +172,7 @@ class Subscriber {
   T pop() {
     if (!p_msg)
       throw MessageError_Empty();
-    std::unique_lock lock(mtx);
+    std::unique_lock<std::mutex> lock(mtx);
     cv.wait(lock, [this]() { return p_msg->pubs.empty() || !fifo.empty(); });
     if (p_msg->pubs.empty())
       throw MessageError_Stopped();
@@ -192,7 +192,7 @@ class Subscriber {
     if (!p_msg)
       throw MessageError_Empty();
     using namespace std::chrono;
-    std::unique_lock lock(mtx);
+    std::unique_lock<std::mutex> lock(mtx);
     if (!cv.wait_for(lock, milliseconds(ms), [this]() {
           return p_msg->pubs.empty() || !fifo.empty();
         })) {
@@ -216,7 +216,7 @@ class Subscriber {
   T pop_until(P pt) {
     if (!p_msg)
       throw MessageError_Empty();
-    std::unique_lock lock(mtx);
+    std::unique_lock<std::mutex> lock(mtx);
     if (!cv.wait_until(lock, pt, [this]() {
           return p_msg->pubs.empty() || !fifo.empty();
         })) {
@@ -231,7 +231,7 @@ class Subscriber {
 
  private:
   void write_obj(const T& obj) {
-    std::unique_lock lock(mtx);
+    std::unique_lock<std::mutex> lock(mtx);
     if (fifo_size > 0 && fifo.size() >= fifo_size) {
       fifo.pop();
     }
@@ -266,14 +266,14 @@ class Publisher {
 
   /// 拷贝构造函数
   Publisher(const Publisher& other) : p_msg(other.p_msg) {
-    std::unique_lock pubs_lock(p_msg->pubs_mtx);
+    std::unique_lock<std::mutex> pubs_lock(p_msg->pubs_mtx);
     p_msg->pubs.emplace_front(this);
   }
 
   /// 移动构造函数
   Publisher(Publisher&& other) noexcept : p_msg(other.p_msg) {
     other.reset();
-    std::unique_lock pubs_lock(p_msg->pubs_mtx);
+    std::unique_lock<std::mutex> pubs_lock(p_msg->pubs_mtx);
     p_msg->pubs.emplace_front(this);
   }
 
@@ -287,10 +287,10 @@ class Publisher {
   void reset() {
     if (!p_msg)
       return;
-    std::unique_lock pubs_lock(p_msg->pubs_mtx);
+    std::unique_lock<std::mutex> pubs_lock(p_msg->pubs_mtx);
     p_msg->pubs.remove(this);
     if (p_msg->pubs.empty()) {
-      std::unique_lock subs_lock(p_msg->subs_mtx);
+      std::unique_lock<std::mutex> subs_lock(p_msg->subs_mtx);
       for (const auto& sub : p_msg->subs) {
         sub->notify();
       }
@@ -305,7 +305,7 @@ class Publisher {
   void bind(const std::string& msg_name) {
     reset();
     p_msg = MsgManager::find_or_create(msg_name);
-    std::unique_lock pubs_lock(p_msg->pubs_mtx);
+    std::unique_lock<std::mutex> pubs_lock(p_msg->pubs_mtx);
     p_msg->pubs.emplace_front(this);
   }
 
@@ -316,7 +316,7 @@ class Publisher {
   void push(const T& obj) {
     if (!p_msg)
       throw MessageError_Empty();
-    std::unique_lock subs_lock(p_msg->subs_mtx);
+    std::unique_lock<std::mutex> subs_lock(p_msg->subs_mtx);
     for (auto& sub : p_msg->subs) {
       sub->write_obj(obj);
       sub->notify();

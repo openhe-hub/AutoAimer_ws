@@ -10,12 +10,12 @@
 #include <ceres/ceres.h>
 #include <fmt/format.h>
 
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/auto_aim/predictor/enemy/enemy_state.hpp"
-#include "aimer/base/armor_defs.hpp"
-#include "aimer/base/math/filter/filter.hpp"
-#include "aimer/base/math/math.hpp"
-#include "aimer/base/robot/coord_converter.hpp"
+#include "../../base/defs.hpp"
+#include "../enemy/enemy_state.hpp"
+#include "../../../base/armor_defs.hpp"
+#include "../../../base/math/filter/filter.hpp"
+#include "../../../base/math/math.hpp"
+#include "../../../base/robot/coord_converter.hpp"
 
 namespace aimer {
 // 滤波器线程

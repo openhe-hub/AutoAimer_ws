@@ -6,7 +6,7 @@
 #include <Eigen/Core>
 #include <opencv2/opencv.hpp>
 
-#include "aimer/base/armor_defs.hpp"
+#include "../../base/armor_defs.hpp"
 
 namespace aimer {
 

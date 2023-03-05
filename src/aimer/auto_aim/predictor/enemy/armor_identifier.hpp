@@ -6,10 +6,10 @@
 #include <map>
 #include <vector>
 
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/base/armor_defs.hpp"
-#include "aimer/base/math/math.hpp"
-#include "aimer/base/robot/coord_converter.hpp"
+#include "../../base/defs.hpp"
+#include "../../../base/armor_defs.hpp"
+#include "../../../base/math/math.hpp"
+#include "../../../base/robot/coord_converter.hpp"
 
 // 装甲板标序号和熄灭补偿方法类，与 aimer::ArmorData 耦合存在。
 //  - 在线程中找不到够近的：++id_cnt, 新增 light 线程

@@ -5,10 +5,10 @@
 #include <map>
 #include <vector>
 
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/auto_aim/predictor/enemy/balance.hpp"
-#include "aimer/base/armor_defs.hpp"
-#include "aimer/base/math/math.hpp"
+#include "../../base/defs.hpp"
+#include "balance.hpp"
+#include "../../../base/armor_defs.hpp"
+#include "../../../base/math/math.hpp"
 #include "core_io/robot.hpp"
 
 namespace aimer {

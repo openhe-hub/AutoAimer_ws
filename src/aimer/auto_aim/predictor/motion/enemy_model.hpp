@@ -3,14 +3,14 @@
 #ifndef AIMER_AUTO_AIM_PREDICTOR_MOTION_ENEMY_MODEL_HPP
 #define AIMER_AUTO_AIM_PREDICTOR_MOTION_ENEMY_MODEL_HPP
 
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/auto_aim/predictor/enemy/enemy_state.hpp"
-#include "aimer/auto_aim/predictor/motion/motion_model.hpp"
-#include "aimer/auto_aim/predictor/motion/top4_model.hpp"
-#include "aimer/auto_aim/predictor/motion/top_model.hpp"
-#include "aimer/base/armor_defs.hpp"
-#include "aimer/base/math/math.hpp"
-#include "aimer/base/robot/coord_converter.hpp"
+#include "../../base/defs.hpp"
+#include "../enemy/enemy_state.hpp"
+#include "motion_model.hpp"
+#include "top4_model.hpp"
+#include "top_model.hpp"
+#include "../../../base/armor_defs.hpp"
+#include "../../../base/math/math.hpp"
+#include "../../../base/robot/coord_converter.hpp"
 #include "core_io/robot.hpp"
 
 namespace aimer {

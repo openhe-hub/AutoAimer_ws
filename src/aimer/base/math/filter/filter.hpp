@@ -4,7 +4,7 @@
 
 #include "adaptive_ekf.hpp"
 #include "kalman.hpp"
-#include "./math.hpp"
+#include "../math.hpp"
 
 // 本文件是为了通过时间获取装甲板的时空坐标、空间速度，而不只是滤波。比较 basic
 namespace aimer {

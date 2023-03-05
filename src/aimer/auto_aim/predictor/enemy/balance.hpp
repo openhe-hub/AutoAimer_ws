@@ -6,9 +6,9 @@
 #include <iostream>
 #include <vector>
 
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/base/armor_defs.hpp"
-#include "aimer/base/math/math.hpp"
+#include "../../base/defs.hpp"
+#include "../../../base/armor_defs.hpp"
+#include "../../../base/math/math.hpp"
 
 namespace aimer {
 // 通过可见装甲板信息判断车辆是不是平衡步兵

@@ -20,11 +20,11 @@
 
 #include "UltraMultiThread/ObjManager.hpp"
 #include "UltraMultiThread/umt.hpp"
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/base/armor_defs.hpp"
+#include "../base/defs.hpp"
+#include "../../base/armor_defs.hpp"
 #include "common/common.hpp"
 #include "enemy_predictor/enemy_predictor.hpp"
-// #include "core_io/robot.hpp"
+#include "core_io/robot.hpp"
 
 namespace aimer {
 

@@ -8,8 +8,11 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs
   aimer_msgs
+
   UltraMultiThread
   base
+  core_io
+  common
 
   geometry_msgs
   sensor_msgs
@@ -27,9 +30,10 @@ include_directories(
 
 add_executable(${PROJECT_NAME} main.cpp)
 
+add_subdirectory(base)
 add_subdirectory(param)
 add_subdirectory(auto_aim)
-add_subdirectory(base)
+
 
 
 

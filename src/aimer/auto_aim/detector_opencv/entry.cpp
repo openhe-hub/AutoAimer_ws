@@ -9,7 +9,7 @@
 #endif
 
 #include <aimer_msgs/SensorsData.h>
-#include <aimer_msgs/DetectionResult.h>>
+#include <aimer_msgs/DetectionResult.h>
 #include <cv_bridge/cv_bridge.h>
 #include <eigen_conversions/eigen_msg.h>
 #include <geometry_msgs/Quaternion.h>
@@ -32,11 +32,11 @@
 
 #include <UltraMultiThread/umt.hpp>
 #include "../../base/armor_defs.hpp"
-#include "./base/defs.hpp"
+#include "../base/defs.hpp"
 #include "TRTModule.hpp"
 // #include "common/common.hpp"
-// #include "core_io/robot.hpp"
-// #include "core_io/sensors.hpp"
+#include "core_io/robot.hpp"
+#include "core_io/sensors.hpp"
 
 #include "base/debug/print.hpp"
 
@@ -172,17 +172,9 @@ bool getTargetArmor(aimer::DetectedArmor a,
 void onDetect() {}
 
 void detector_run(const std::string& module_path) {
-    // 创建相机陀螺仪数据接收者
-    // umt::Subscriber<SensorsData> subscriber("sensors_data");
-
-    // 创建识别结果发布者
-    // umt::Publisher<aimer::DetectionResult> publisher("detections");
-
     auto detection_checkbox =
         umt::ObjManager<CheckBox>::find_or_create("show detections");
     
-    // umt::Publisher<cv::Mat> detections_client("image-detections");
-
     auto recv_data =
         umt::ObjManager<RobotStatus>::find_or_create("robot_status");
     auto mode_lock = umt::ObjManager<RobotStatus>::find_or_create("mode_lock");

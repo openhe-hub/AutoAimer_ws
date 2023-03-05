@@ -1,8 +1,8 @@
 #ifndef AIMER_AUTO_AIM_PREDICTOR_MOTION_TOP4_MODEL_HPP
 #define AIMER_AUTO_AIM_PREDICTOR_MOTION_TOP4_MODEL_HPP
 
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/auto_aim/predictor/motion/top_model.hpp"
+#include "../../base/defs.hpp"
+#include "top_model.hpp"
 
 namespace aimer {
 namespace top {

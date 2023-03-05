@@ -7,9 +7,9 @@
 #include <Eigen/Dense>
 #include <opencv2/core/eigen.hpp>
 
-#include "./armor_defs.hpp"
-#include "./math/math.hpp"
-#include "aimer/param/parameter.hpp"
+#include "../armor_defs.hpp"
+#include "../math/math.hpp"
+#include "../../param/parameter.hpp"
 
 namespace aimer {
 
@@ -63,7 +63,9 @@ class ResistanceFuncLinear {
 CoordConverter::CoordConverter()
     : robot_status_obj{
           umt::ObjManager<RobotStatus>::find_or_create("robot_status")} {
-  cv::FileStorage fin(CMAKE_DEFINE_PROJECT_DIR "/assets/param.yml",
+  // cv::FileStorage fin(CMAKE_DEFINE_PROJECT_DIR "/assets/param.yml",
+  //                     cv::FileStorage::READ);
+  cv::FileStorage fin("/assets/param.yml",
                       cv::FileStorage::READ);
   fin["R_CI"] >> this->rot_ic_sup_cv_mat;
   fin["F"] >> this->f_cv_mat;

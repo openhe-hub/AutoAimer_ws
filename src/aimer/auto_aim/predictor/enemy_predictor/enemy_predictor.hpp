@@ -16,15 +16,15 @@
 #include <opencv2/core/eigen.hpp>
 #include <opencv2/opencv.hpp>
 
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/auto_aim/predictor/aim/aim_corrector.hpp"
-#include "aimer/auto_aim/predictor/enemy/armor_identifier.hpp"
-#include "aimer/auto_aim/predictor/enemy/enemy_state.hpp"
-#include "aimer/auto_aim/predictor/motion/enemy_model.hpp"
-#include "aimer/base/armor_defs.hpp"
-#include "aimer/base/debug/debug.hpp"
-#include "aimer/base/math/math.hpp"
-#include "aimer/base/robot/coord_converter.hpp"
+#include "../../base/defs.hpp"
+#include "../aim/aim_corrector.hpp"
+#include "../enemy/armor_identifier.hpp"
+#include "../enemy/enemy_state.hpp"
+#include "../motion/enemy_model.hpp"
+#include "../../../base/armor_defs.hpp"
+#include "../../../base/debug/debug.hpp"
+#include "../../../base/math/math.hpp"
+#include "../../../base/robot/coord_converter.hpp"
 #include "core_io/robot.hpp"
 
 // 不在自瞄也要进行所有 kalman，只是不发送电控指令，且选敌逻辑有区别

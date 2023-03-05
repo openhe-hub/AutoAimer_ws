@@ -183,7 +183,9 @@ void PredictorParameter::load() {
     this->param_double.emplace(param::create_double_obj(d.first));
     param::find_double_obj(d.first)->value = d.second;
   }
-  cv::FileStorage reader(CMAKE_DEFINE_PROJECT_DIR "/assets/aimer_param.yml",
+  // cv::FileStorage reader(CMAKE_DEFINE_PROJECT_DIR "/assets/aimer_param.yml",
+  //                        cv::FileStorage::READ);  
+  cv::FileStorage reader("/assets/aimer_param.yml",
                          cv::FileStorage::READ);
   if (reader.isOpened()) {
     try {
@@ -228,7 +230,9 @@ void PredictorParameter::update() {
       std::this_thread::sleep_for(1s);
       continue;
     }
-    cv::FileStorage reader(CMAKE_DEFINE_PROJECT_DIR "/assets/aimer_param.yml",
+    // cv::FileStorage reader(CMAKE_DEFINE_PROJECT_DIR "/assets/aimer_param.yml",
+    //                        cv::FileStorage::READ);   
+    cv::FileStorage reader("/assets/aimer_param.yml",
                            cv::FileStorage::READ);
     if (!reader.isOpened()) {
       base::print(
