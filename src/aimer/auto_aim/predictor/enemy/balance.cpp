@@ -1,6 +1,6 @@
-#include "aimer/auto_aim/predictor/enemy/balance.hpp"
+#include "balance.hpp"
 
-#include "aimer/param/parameter.hpp"
+#include "../../../param/parameter.hpp"
 
 namespace aimer {
 /// @class BalanceJudger

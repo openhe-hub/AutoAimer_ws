@@ -11,11 +11,11 @@
 
 #include "UltraMultiThread/umt.hpp"
 #include "../armor_defs.hpp"
-#include "base/debug/print.hpp"
+#include "../debug/debug.hpp"
 #include "../math/filter/filter.hpp"
 #include "../math/math.hpp"
 #include "../../param/parameter.hpp"
-#include "../../auto_aim/predictor/enemy_predictor/enemy_predictor.hpp"
+// #include "../../auto_aim/predictor/enemy_predictor/enemy_predictor.hpp"
 #include "core_io/robot.hpp"
 
 namespace aimer {

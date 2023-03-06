@@ -1,11 +1,11 @@
-#include "aimer/auto_aim/predictor/pnp/pnp.hpp"
+#include "pnp.hpp"
 
 #include <opencv2/calib3d.hpp>
 #include <opencv2/core/eigen.hpp>
 
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/base/robot/coord_converter.hpp"
-#include "aimer/param/parameter.hpp"
+#include "../../base/defs.hpp"
+#include "../../../base/robot/coord_converter.hpp"
+#include "../../../param/parameter.hpp"
 
 namespace aimer {
 

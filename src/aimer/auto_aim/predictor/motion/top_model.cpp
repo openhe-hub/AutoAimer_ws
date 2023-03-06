@@ -1,4 +1,4 @@
-#include "aimer/auto_aim/predictor/motion/top_model.hpp"
+#include "top_model.hpp"
 
 #include <ceres/autodiff_cost_function.h>
 #include <ceres/ceres.h>
@@ -6,8 +6,8 @@
 #include <ceres/problem.h>
 
 // "" root location: closest CMakeLists
-#include "aimer/base/armor_defs.hpp"
-#include "aimer/base/robot/coord_converter.hpp"
+#include "../../../base/armor_defs.hpp"
+#include "../../../base/robot/coord_converter.hpp"
 
 namespace aimer {
 namespace top {

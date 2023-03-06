@@ -18,215 +18,170 @@
 #include <fmt/format.h>
 #include <pybind11/numpy.h>
 
+#include "../../base/armor_defs.hpp"
+#include "../base/defs.hpp"
 #include "UltraMultiThread/ObjManager.hpp"
 #include "UltraMultiThread/umt.hpp"
-#include "../base/defs.hpp"
-#include "../../base/armor_defs.hpp"
 #include "common/common.hpp"
-#include "enemy_predictor/enemy_predictor.hpp"
 #include "core_io/robot.hpp"
+#include "enemy_predictor/enemy_predictor.hpp"
 
 namespace aimer {
 
 namespace umt = ::umt;
 using namespace std::chrono_literals;  // like 200ms
 
-aimer::DetectionResult data = {};
-::RobotCmd send = {};
+class Predictor {
+   private:
+    aimer::DetectionResult data = {};
+    ::RobotCmd send = {};
 
+    std::shared_ptr<::RobotStatus> robot_status;
+    std::shared_ptr<::CheckBox> predictor_aim_checkbox;
+    std::shared_ptr<::CheckBox> predictor_map_checkbox;
+    std::shared_ptr<::base::webview_data::Page> webview_data_page;
 
-void detectionResultCallback(const aimer_msgs::DetectionResult::ConstPtr& result);
-void publishRobotCmd(const ros::Publisher& publisher, ::RobotCmd robotCmd);
-void publishWebview(const ros::Publisher& publisher, cv::Mat& img);
-void onPredict();
-void predictor_run(const ros::Publisher& cmdPub,
-                   const ros::Publisher& webviewMapPub,
-                   const ros::Publisher& webviewAimPub);
+    std::unique_ptr<aimer::EnemyPredictor> enemy_predictor;
+    int fps, fps_count;
+    std::chrono::_V2::system_clock::time_point t1;
 
+    ros::Subscriber detectionResultSub;
+    ros::Publisher cmdPub;
+    ros::Publisher webviewMapPub;
+    ros::Publisher webviewAimPub;
 
-void detectionResultCallback(
-    const aimer_msgs::DetectionResult::ConstPtr& result) {
-    // sensor_msgs/Image => cv::Mat
-    cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(
-        result->img, sensor_msgs::image_encodings::TYPE_8UC3);
-    data.img = cv_ptr->image;
-    // time => double
-    data.timestamp = result->stamp.toSec();
-    // geometry_msgs/Quaternion => Eigen Quaternion
-    tf::quaternionMsgToEigen(result->q, data.q);
-    
-    onPredict();
-}
+   public:
+    void detectionResultCallback(
+        const aimer_msgs::DetectionResult::ConstPtr& result) {
+        // sensor_msgs/Image => cv::Mat
+        cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(
+            result->img, sensor_msgs::image_encodings::TYPE_8UC3);
+        data.img = cv_ptr->image;
+        // time => double
+        data.timestamp = result->stamp.toSec();
+        // geometry_msgs/Quaternion => Eigen Quaternion
+        Eigen::Quaterniond _q;
+        tf::quaternionMsgToEigen(result->q, _q);
+        Eigen::Vector4d vec = _q.coeffs();
+        this->data.q = {vec(0), vec(1), vec(2), vec(3)};
 
-void publishRobotCmd(const ros::Publisher& publisher, ::RobotCmd robotCmd) {
-    aimer_msgs::RobotCmd cmd;
-    // maybe need some conversions
-    cmd.aim_id = robotCmd.aim_id;
-    cmd.car_id = robotCmd.car_id;
-    cmd.detection_info = robotCmd.detection_info;
-    cmd.yaw = robotCmd.yaw;
-    cmd.pitch = robotCmd.pitch;
-    cmd.yaw_v = robotCmd.yaw_v;
-    cmd.pitch_v = robotCmd.pitch_v;
-    cmd.dist = robotCmd.dist;
-    cmd.shoot = robotCmd.shoot;
-    cmd.period = robotCmd.period;
-    cmd.lrc = robotCmd.lrc;
-    cmd.lock_yaw = robotCmd.lock_yaw;
-
-    publisher.publish(cmd);
-}
-
-void publishWebview(const ros::Publisher& publisher, cv::Mat& img) {
-    sensor_msgs::ImagePtr img =
-        cv_bridge::CvImage(std_msgs::Header(), "bgr8", img).toImageMsg();
-    publisher.publish(*img);
-}
-
-void onPredict() {
-    if (robot_status->program_mode == ::ProgramMode::ENERGY_HIT ||
-        robot_status->program_mode == ::ProgramMode::ENERGY_DISTURB) {
-        std::this_thread::sleep_for(200ms);
-        continue;
-    }
-    send = enemy_predictor->predict(data);
-
-    if (std::isnan(send.yaw) || std::isnan(send.pitch) ||
-        std::isinf(send.yaw) || std::isinf(send.pitch)) {
-        fmt::print(fmt::fg(fmt::color::red),
-                   "====================Predictor output nan of inf, rebuilt
-                       it == ==
-                       ==
-                   = "
-                     "=============\n");
-        enemy_predictor = nullptr;  // 删除
-        enemy_predictor = std::make_unique<aimer::EnemyPredictor>();
-        std::this_thread::sleep_for(200ms);  // 是否需要 sleep？
-        continue;
+        this->onPredict();
     }
 
-    send.seq_id++;  // 若没有目标，则 predict 函数内 send 未改动
+    void publishRobotCmd() {
+        aimer_msgs::RobotCmd cmd;
+        // maybe need some conversions
+        cmd.aim_id = this->send.aim_id;
+        cmd.car_id = this->send.car_id;
+        cmd.detection_info = this->send.detection_info;
+        cmd.yaw = this->send.yaw;
+        cmd.pitch = this->send.pitch;
+        cmd.yaw_v = this->send.yaw_v;
+        cmd.pitch_v = this->send.pitch_v;
+        cmd.dist = this->send.dist;
+        cmd.shoot = (uint8_t)this->send.shoot;
+        cmd.period = this->send.period;
+        cmd.lrc = this->send.lrc;
+        cmd.lock_yaw = this->send.lock_yaw;
 
-    publishRobotCmd(cmdPub, send);
+        this->cmdPub.publish(cmd);
+    }
 
-    if (predictor_aim_checkbox->checked) {
-        fps_count++;
-        auto t2 = std::chrono::system_clock::now();
-        if (std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1)
-                .count() >= 1000) {
-            fps = fps_count;
-            fps_count = 0;
-            t1 = t2;
+    void publishWebview(const ros::Publisher& publisher, cv::Mat& img) {
+        sensor_msgs::ImagePtr p_img =
+            cv_bridge::CvImage(std_msgs::Header(), "bgr8", img).toImageMsg();
+        publisher.publish(p_img);
+    }
+
+    void onPredict() {
+        if (this->robot_status->program_mode == ::ProgramMode::ENERGY_HIT ||
+            this->robot_status->program_mode == ::ProgramMode::ENERGY_DISTURB) {
+            std::this_thread::sleep_for(200ms);
+            // continue;
         }
-        cv::Mat im2show{enemy_predictor->draw_aim(data.img)};
-        cv::putText(im2show, fmt::format("fps={}", fps), {10, 25},
-                    cv::FONT_HERSHEY_SIMPLEX, 1, {0, 0, 255});
-        publishWebview(webviewAimPub, im2show);
+
+        if (std::isnan(this->send.yaw) || std::isnan(this->send.pitch) ||
+            std::isinf(this->send.yaw) || std::isinf(this->send.pitch)) {
+            fmt::print(fmt::fg(fmt::color::red),
+                       "=== Predictor output nan of inf, rebuilt it ===\n");
+            this->enemy_predictor = nullptr;  // 删除
+            this->enemy_predictor = std::make_unique<aimer::EnemyPredictor>();
+            std::this_thread::sleep_for(200ms);  // 是否需要 sleep？
+            // continue;
+        }
+
+        this->send.seq_id++;  // 若没有目标，则 predict 函数内 send 未改动
+
+        publishRobotCmd();
+
+        if (this->predictor_aim_checkbox->checked) {
+            this->fps_count++;
+            auto t2 = std::chrono::system_clock::now();
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1)
+                    .count() >= 1000) {
+                this->fps = this->fps_count;
+                this->fps_count = 0;
+                this->t1 = t2;
+            }
+            cv::Mat im2show{enemy_predictor->draw_aim(data.img)};
+            cv::putText(im2show, fmt::format("fps={}", fps), {10, 25},
+                        cv::FONT_HERSHEY_SIMPLEX, 1, {0, 0, 255});
+            publishWebview(this->webviewAimPub, im2show);
+        }
+        if (predictor_map_checkbox->checked) {
+            cv::Mat img{enemy_predictor->draw_map()};
+            publishWebview(this->webviewMapPub, img);
+        }
     }
-    if (predictor_map_checkbox->checked) {
-        cv::Mat img{enemy_predictor->draw_map()};
-        publishWebview(webviewMapPub, img);
-    }
-}
 
-void predictor_run(const ros::Publisher& cmdPub,
-                   const ros::Publisher& webviewMapPub,
-                   const ros::Publisher& webviewAimPub) {
-    // 接收电控数据
-    auto robot_status =
-        umt::ObjManager<::RobotStatus>::find_or_create("robot_status");
-    // 发布器，点击控制指令发送者
+    void predictor_run(ros::NodeHandle& node) {
+        // define publisher & subscriber
+        this->detectionResultSub = node.subscribe<aimer_msgs::DetectionResult>(
+            "detection_result", 10, &Predictor::detectionResultCallback, this);
+        this->cmdPub = node.advertise<aimer_msgs::RobotCmd>("robot_cmd", 10);
+        this->webviewMapPub =
+            node.advertise<sensor_msgs::Image>("aimer.auto_aim.aim", 10);
+        this->webviewAimPub =
+            node.advertise<sensor_msgs::Image>("aimer.auto_aim.map", 10);
 
-    auto predictor_aim_checkbox =
-        umt::ObjManager<::CheckBox>::find_or_create("show
-        aimer.auto_aim.aim");
+        // 接收电控数据
+        this->robot_status =
+            umt::ObjManager<::RobotStatus>::find_or_create("robot_status");
+        // 发布器，点击控制指令发送者
 
-    auto predictor_map_checkbox =
-        umt::ObjManager<::CheckBox>::find_or_create("show
-        aimer.auto_aim.map");
+        this->predictor_aim_checkbox =
+            umt::ObjManager<::CheckBox>::find_or_create(
+                "show aimer.auto_aim.aim");
 
-    auto webview_data_page =
-        umt::ObjManager<::base::webview_data::Page>::find_or_create(
-            "aimer.auto_aim.aim");
+        this->predictor_map_checkbox =
+            umt::ObjManager<::CheckBox>::find_or_create(
+                "show aimer.auto_aim.map");
 
-    while (aimer::param::find_int_obj("PARAM_LOADED") == nullptr) {
-      fmt::print(fmt::fg(fmt::color::orange),
-                 "[WARNING] @auto_aim.predictor: 等待 aimer
-                 参数全部创建.\n");
-      std::this_thread::sleep_for(200ms);
-    }
-    auto enemy_predictor = std::make_unique<aimer::EnemyPredictor>();
-    int fps = 0, fps_count = 0;
-    auto t1 = std::chrono::system_clock::now();
+        this->webview_data_page =
+            umt::ObjManager<::base::webview_data::Page>::find_or_create(
+                "aimer.auto_aim.aim");
 
-    while (true) {
-        try {
-            // MANUAL: 计算但不动枪口且不发射（可发信号来给 UI 反馈）
-            // ENERGY相关: 停止计算进程，给能量机关计算
-            if (robot_status->program_mode == ::ProgramMode::ENERGY_HIT ||
-                robot_status->program_mode == ::ProgramMode::ENERGY_DISTURB) {
-                std::this_thread::sleep_for(200ms);
-                continue;
-            }
-            // data = subscriber.pop();
-            send = enemy_predictor->predict(data);
-
-            if (std::isnan(send.yaw) || std::isnan(send.pitch) ||
-                std::isinf(send.yaw) || std::isinf(send.pitch)) {
-                fmt::print(
-                    fmt::fg(fmt::color::red),
-                    "====================Predictor output nan of inf, rebuilt
-                        it == ==
-                        ==
-                    = "
-                      "=============\n");
-                enemy_predictor = nullptr;  // 删除
-                enemy_predictor = std::make_unique<aimer::EnemyPredictor>();
-                std::this_thread::sleep_for(200ms);  // 是否需要 sleep？
-                continue;
-            }
-
-            send.seq_id++;  // 若没有目标，则 predict 函数内 send 未改动
-
-            publishRobotCmd(cmdPub, send);
-
-            if (predictor_aim_checkbox->checked) {
-                fps_count++;
-                auto t2 = std::chrono::system_clock::now();
-                if (std::chrono::duration_cast<std::chrono::milliseconds>(t2 -
-                                                                          t1)
-                        .count() >= 1000) {
-                    fps = fps_count;
-                    fps_count = 0;
-                    t1 = t2;
-                }
-                cv::Mat im2show{enemy_predictor->draw_aim(data.img)};
-                cv::putText(im2show, fmt::format("fps={}", fps), {10, 25},
-                            cv::FONT_HERSHEY_SIMPLEX, 1, {0, 0, 255});
-                publishWebview(webviewAimPub, im2show);
-            }
-            if (predictor_map_checkbox->checked) {
-                cv::Mat img{enemy_predictor->draw_map()};
-                publishWebview(webviewMapPub, img);
-            }
-        } catch (umt::MessageError& e) {
+        while (aimer::param::find_int_obj("PARAM_LOADED") == nullptr) {
             fmt::print(
-                fmt::fg(fmt::color::orange), "[WARNING] 'detection_data'
-                                             {}\n ",
-                                             e.what());
-            std::this_thread::sleep_for(500ms);
+                fmt::fg(fmt::color::orange),
+                "[WARNING] @auto_aim.predictor: 等待 aimer参数全部创建.\n");
+            std::this_thread::sleep_for(200ms);
         }
+        this->enemy_predictor = std::make_unique<aimer::EnemyPredictor>();
+        this->fps = 0;
+        this->fps_count = 0;
+        this->t1 = std::chrono::system_clock::now();
     }
-}
+};
+}  // namespace aimer
 
 // void background_predictor_run() {
 //     std::cerr
 //         << "=========================background_predictor_run=============="
 //            "================"
 //         << std::endl;
-//     std::thread([]() { aimer::predictor_run(); }).detach();
+//     std::thread([]() { /* aimer::predictor_run(); */ }).detach();
 // }
-// }  // namespace aimer
 
 // PYBIND11_EMBEDDED_MODULE(aimer_auto_aim_predictor, m) {
 //     // namespace py = pybind11;
@@ -236,18 +191,9 @@ void predictor_run(const ros::Publisher& cmdPub,
 int main(int argc, char** argv) {
     ros::init(argc, argv, "predictor");
     ros::NodeHandle node;
+    aimer::Predictor predictor;
 
-    ros::Subscriber detectionResultSub =
-        node.subscribe<aimer_msgs::DetectionResult>(
-            "detection_result", 10, aimer::detectionResultCallback);
-    ros::Publisher robotCmdPub =
-        node.advertise<aimer_msgs::RobotCmd>("robot_cmd", 10);
-    ros::Publisher webview_predictor_aim =
-        node.advertise<sensor_msgs::Image>("aimer.auto_aim.aim", 10);
-    ros::Publisher webview_predictor_map =
-        node.advertise<sensor_msgs::Image>("aimer.auto_aim.map", 10);
-
-    predictor_run();
+    predictor.predictor_run(node);
 
     ros::spin();
     return 0;

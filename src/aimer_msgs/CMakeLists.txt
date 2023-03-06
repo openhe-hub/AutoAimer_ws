@@ -25,12 +25,11 @@ generate_messages(
 )
 
 catkin_package(
-  INCLUDE_DIRS include
   CATKIN_DEPENDS roscpp message_runtime sensor_msgs geometry_msgs
 )
 
 include_directories(
-# include
+  include
   ${catkin_INCLUDE_DIRS}
 )
 

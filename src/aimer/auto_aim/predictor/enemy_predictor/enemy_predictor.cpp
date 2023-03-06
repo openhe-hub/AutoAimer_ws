@@ -1,20 +1,20 @@
-#include "aimer/auto_aim/predictor/enemy_predictor/enemy_predictor.hpp"
+#include "enemy_predictor.hpp"
 
 #include <algorithm>
 
 #include <opencv2/calib3d.hpp>
 #include <opencv2/imgproc.hpp>
 
-#include "./common/common.hpp"
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/auto_aim/predictor/aim/aim_corrector.hpp"
-#include "aimer/auto_aim/predictor/enemy/armor_identifier.hpp"
-#include "aimer/auto_aim/predictor/pnp/pnp.hpp"
-#include "aimer/base/armor_defs.hpp"
-#include "aimer/base/debug/debug.hpp"
-#include "aimer/base/math/math.hpp"
-#include "aimer/base/robot/coord_converter.hpp"
-#include "aimer/param/parameter.hpp"
+#include "common/common.hpp"
+#include "../../base/defs.hpp"
+#include "../aim/aim_corrector.hpp"
+#include "../enemy/armor_identifier.hpp"
+#include "../pnp/pnp.hpp"
+#include "../../../base/armor_defs.hpp"
+#include "../../../base/debug/debug.hpp"
+#include "../../../base/math/math.hpp"
+#include "../../../base/robot/coord_converter.hpp"
+#include "../../../param/parameter.hpp"
 #include "core_io/robot.hpp"
 
 // 不在自瞄也要进行所有 kalman，只是不发送电控指令，且选敌逻辑有区别
@@ -499,11 +499,11 @@ aimer::AimInfo EnemyPredictor::get_aim() {
     aimer::debug::auto_aim_page()
         ->sub("预测器信息")
         .sub("发送给电控_yaw")
-        .get() = fmt::format("{:.2f}", cmd.yaw);
+        .get() = fmt::format("{:.2f}", (float)cmd.yaw);
     aimer::debug::auto_aim_page()
         ->sub("预测器信息")
         .sub("发送给电控_pitch")
-        .get() = fmt::format("{:.2f}", cmd.pitch);
+        .get() = fmt::format("{:.2f}", (float)cmd.pitch);
     aimer::debug::auto_aim_page()
         ->sub("预测器信息")
         .sub("发送给电控_shoot")

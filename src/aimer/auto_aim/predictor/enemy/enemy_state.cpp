@@ -1,6 +1,6 @@
-#include "aimer/auto_aim/predictor/enemy/enemy_state.hpp"
+#include "enemy_state.hpp"
 
-#include "aimer/param/parameter.hpp"
+#include "../../../param/parameter.hpp"
 
 namespace aimer {
 

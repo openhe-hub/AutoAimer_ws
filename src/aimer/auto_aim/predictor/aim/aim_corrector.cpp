@@ -1,12 +1,12 @@
-#include "aimer/auto_aim/predictor/aim/aim_corrector.hpp"
+#include "aim_corrector.hpp"
 
-#include "./common/common.hpp"
-#include "aimer/auto_aim/predictor/aim/detect_bullet.hpp"
-#include "aimer/auto_aim/predictor/aim/do_reproj.hpp"
-#include "aimer/base/debug/debug.hpp"
-#include "aimer/base/math/math.hpp"
-#include "aimer/base/robot/coord_converter.hpp"
-#include "aimer/param/parameter.hpp"
+#include "common/common.hpp"
+#include "detect_bullet.hpp"
+#include "do_reproj.hpp"
+#include "../../../base/debug/debug.hpp"
+#include "../../../base/math/math.hpp"
+#include "../../../base/robot/coord_converter.hpp"
+#include "../../../param/parameter.hpp"
 
 namespace aimer {
 namespace aim {

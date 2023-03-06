@@ -1,6 +1,6 @@
-#include "aimer/auto_aim/predictor/motion/top4_model.hpp"
+#include "top4_model.hpp"
 
-#include "aimer/base/debug/debug.hpp"
+#include "../../../base/debug/debug.hpp"
 
 namespace aimer {
 namespace top {

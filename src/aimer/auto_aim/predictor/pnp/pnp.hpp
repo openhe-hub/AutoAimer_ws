@@ -4,9 +4,9 @@
 #include <Eigen/Core>
 #include <opencv2/opencv.hpp>
 
-#include "aimer/auto_aim/base/defs.hpp"
-#include "aimer/base/armor_defs.hpp"
-#include "aimer/base/robot/coord_converter.hpp"
+#include "../../base/defs.hpp"
+#include "../../../base/armor_defs.hpp"
+#include "../../../base/robot/coord_converter.hpp"
 
 namespace aimer {
 aimer::ArmorInfo detected_to_info(const aimer::DetectedArmor& detected,

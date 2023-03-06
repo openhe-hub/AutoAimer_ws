@@ -1,6 +1,6 @@
-#include "aimer/auto_aim/predictor/motion/motion_model.hpp"
+#include "motion_model.hpp"
 
-#include "aimer/base/robot/coord_converter.hpp"
+#include "../../../base/robot/coord_converter.hpp"
 
 namespace aimer {
 /** @struct FilterThread */

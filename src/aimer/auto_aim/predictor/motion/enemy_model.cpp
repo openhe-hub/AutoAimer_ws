@@ -1,4 +1,4 @@
-#include "aimer/auto_aim/predictor/motion/enemy_model.hpp"
+#include "enemy_model.hpp"
 
 #include <cstddef>
 #include <iostream>
@@ -8,9 +8,9 @@
 #include <fmt/color.h>
 #include <fmt/format.h>
 
-#include "aimer/auto_aim/predictor/motion/motion_model.hpp"
-#include "aimer/auto_aim/predictor/motion/top_model.hpp"
-#include "aimer/base/debug/debug.hpp"
+#include "motion_model.hpp"
+#include "top_model.hpp"
+#include "../../../base/debug/debug.hpp"
 
 namespace aimer {
 

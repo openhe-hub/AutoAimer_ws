@@ -35,7 +35,7 @@ class SmartModel {
  public:
   explicit SmartModel(const Attributes &a, const std::string &onnx_file);
 
-  SmartModel(const SmartModel &module) = delete;
+  // SmartModel(const SmartModel &module) = delete;
 
   std::vector<bbox_t> operator()(const cv::Mat &img);
 

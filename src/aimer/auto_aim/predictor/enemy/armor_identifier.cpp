@@ -1,5 +1,5 @@
-#include "aimer/auto_aim/predictor/enemy/armor_identifier.hpp"
-#include "aimer/base/debug/debug.hpp"
+#include "armor_identifier.hpp"
+#include "../../../base/debug/debug.hpp"
 
 namespace aimer {
 
