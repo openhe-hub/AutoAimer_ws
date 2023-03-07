@@ -10,9 +10,21 @@ namespace fmt = ::fmt;
 
 enum class PrintMode { Info, Warning, Error, Panic };
 
-extern const std::unordered_map<base::PrintMode, fmt::color> PRINT_COLOR;
+// extern const std::unordered_map<base::PrintMode, fmt::color> PRINT_COLOR;
 
-extern const std::unordered_map<base::PrintMode, std::string> PRINT_PREFIX;
+// extern const std::unordered_map<base::PrintMode, std::string> PRINT_PREFIX;
+
+const std::unordered_map<base::PrintMode, fmt::color> PRINT_COLOR = {
+    {PrintMode::Info, fmt::color::cornflower_blue},
+    {PrintMode::Warning, fmt::color::orange},
+    {PrintMode::Error, fmt::color::red},
+    {PrintMode::Panic, fmt::color::red}};
+
+const std::unordered_map<base::PrintMode, std::string> PRINT_PREFIX = {
+    {PrintMode::Info, "[INFO]"},
+    {PrintMode::Warning, "[WARNING]"},
+    {PrintMode::Error, "[ERROR]"},
+    {PrintMode::Panic, "[PANIC]"}};
 
 template <typename... T>
 auto print(const base::PrintMode& mode,

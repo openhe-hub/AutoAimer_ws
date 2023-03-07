@@ -63,7 +63,7 @@ class Predictor {
         Eigen::Quaterniond _q;
         tf::quaternionMsgToEigen(result->q, _q);
         Eigen::Vector4d vec = _q.coeffs();
-        this->data.q = {vec(0), vec(1), vec(2), vec(3)};
+        this->data.q = {(float)vec(0), (float)vec(1), (float)vec(2), (float)vec(3)};
 
         this->onPredict();
     }
@@ -175,17 +175,9 @@ class Predictor {
 };
 }  // namespace aimer
 
-// void background_predictor_run() {
-//     std::cerr
-//         << "=========================background_predictor_run=============="
-//            "================"
-//         << std::endl;
-//     std::thread([]() { /* aimer::predictor_run(); */ }).detach();
-// }
-
 // PYBIND11_EMBEDDED_MODULE(aimer_auto_aim_predictor, m) {
 //     // namespace py = pybind11;
-//     m.def("background_predictor_run", aimer::background_predictor_run);
+//     // m.def("background_predictor_run", aimer::background_predictor_run);
 // }
 
 int main(int argc, char** argv) {

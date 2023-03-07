@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(aimer)
 
-set(CMAKE_CXX_STANDARD 17)
-
+set(CMAKE_CXX_STANDARD 14)
+add_compile_options(-fPIC)
+# add_compile_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -30,13 +31,14 @@ include_directories(
 
 find_package(Python 3.6 REQUIRED COMPONENTS Development Interpreter)
 find_package(pybind11 REQUIRED)
+find_package(fmt 3 REQUIRED)
 
 include_directories(${Python_INCLUDE_DIRS})
 include_directories(${pybind11_INCLUDE_DIRS})
 
-add_executable(${PROJECT_NAME} main.cpp)
+add_library(${PROJECT_NAME} entry.cpp)
 
-target_link_libraries(${PROJECT_NAME} Python::Python pybind11::pybind11)
+target_link_libraries(${PROJECT_NAME} Python::Python pybind11::pybind11 fmt::fmt)
 
 add_subdirectory(base)
 add_subdirectory(param)
