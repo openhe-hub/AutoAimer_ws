@@ -14,6 +14,8 @@
 #include "../enemy/enemy_state.hpp"
 #include "../../../base/armor_defs.hpp"
 #include "../../../base/math/filter/filter.hpp"
+#include "../../../base/math/filter/kalman.hpp"
+#include "../../../base/math/filter/adaptive_ekf.hpp"
 #include "../../../base/math/math.hpp"
 #include "../../../base/robot/coord_converter.hpp"
 #include "../../../param/parameter.hpp"

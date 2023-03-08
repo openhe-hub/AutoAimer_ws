@@ -8,7 +8,6 @@
 #include <opencv2/core/eigen.hpp>
 
 #include "../armor_defs.hpp"
-#include "../math/math.hpp"
 #include "../../param/parameter.hpp"
 
 namespace aimer {

@@ -41,14 +41,14 @@ class Kalman {
     this->predict_order = predict_order;
     this->x_k1 = Matrix_x1d::Zero();
     this->t = 0.;
-    this->P = Matrix_xxd::Ones() * this->INF;  // Identity 背锅
+    this->P = Matrix_xxd::Ones() * 998244353.;  // Identity 背锅
   }
 
   Matrix_x1d get_x_k1() const { return this->x_k1; }
 
   void init() {
     this->x_k1 = Matrix_x1d::Zero();
-    this->P = Matrix_xxd::Ones() * this->INF;
+    this->P = Matrix_xxd::Ones() * 998244353.;
   }
 
   void set_x(const double& x) { this->x_k1(0, 0) = x; }

@@ -38,7 +38,7 @@ class AdaptiveEkf {
  public:
   AdaptiveEkf()
       : x_e{AdaptiveEkf::MatrixX1::Zero()},
-        p_mat{AdaptiveEkf::MatrixXX::Identity() * INF} {}
+        p_mat{AdaptiveEkf::MatrixXX::Identity() * 1e9} {}
 
   // 初始化且方差为单位矩阵
   void init_x(const AdaptiveEkf::MatrixX1& x0) {

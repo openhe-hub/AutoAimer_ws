@@ -24,7 +24,8 @@
 #include "UltraMultiThread/umt.hpp"
 #include "common/common.hpp"
 #include "core_io/robot.hpp"
-#include "enemy_predictor/enemy_predictor.hpp"
+#include "./enemy_predictor/enemy_predictor.hpp"
+#include "../param/parameter.hpp"
 
 namespace aimer {
 
@@ -123,7 +124,7 @@ class Predictor {
                 this->fps_count = 0;
                 this->t1 = t2;
             }
-            cv::Mat im2show{enemy_predictor->draw_aim(data.img)};
+            cv::Mat im2show{this->enemy_predictor->draw_aim(data.img)};
             cv::putText(im2show, fmt::format("fps={}", fps), {10, 25},
                         cv::FONT_HERSHEY_SIMPLEX, 1, {0, 0, 255});
             publishWebview(this->webviewAimPub, im2show);
