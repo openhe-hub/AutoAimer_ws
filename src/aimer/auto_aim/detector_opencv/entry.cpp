@@ -361,6 +361,8 @@ int main(int argc, char** argv) {
 
     detector.detector_run("", node);
 
+    ROS_INFO("detector_opencv node is running.");
+
     ros::spin();
     return 0;
 }

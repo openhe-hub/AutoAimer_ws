@@ -141,9 +141,9 @@ class Predictor {
             "detection_result", 10, &Predictor::detectionResultCallback, this);
         this->cmdPub = node.advertise<aimer_msgs::RobotCmd>("robot_cmd", 10);
         this->webviewMapPub =
-            node.advertise<sensor_msgs::Image>("aimer.auto_aim.aim", 10);
+            node.advertise<sensor_msgs::Image>("aimer/auto_aim/aim", 10);
         this->webviewAimPub =
-            node.advertise<sensor_msgs::Image>("aimer.auto_aim.map", 10);
+            node.advertise<sensor_msgs::Image>("aimer/auto_aim/map", 10);
 
         // 接收电控数据
         this->robot_status =
@@ -187,6 +187,8 @@ int main(int argc, char** argv) {
     aimer::Predictor predictor;
 
     predictor.predictor_run(node);
+
+    ROS_INFO("predictor node is running.");
 
     ros::spin();
     return 0;

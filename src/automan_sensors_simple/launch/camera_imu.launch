@@ -1,0 +1,9 @@
+<launch>
+    <node pkg="automan_sensors_simple" type="camera_imu" name="camera_imu" output="screen" >
+        <param name="camera_name" value="balance" />
+        <param name="camera_cfg" value="$(find automan_sensors_simple)/assets/MV-CA016-10UC_00K31937955.mfs" />
+        <param name="sensor_param_file" value="$(find automan_sensors_simple)/assets/param.yml" />
+        <param name="imu_usb_hid" value="USB VID:PID=0483:5740 SNR=2050396B5841" />
+        <param name="sync_period_ms" value="10" />
+    </node>
+</launch>
